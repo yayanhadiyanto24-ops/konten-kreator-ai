@@ -411,15 +411,15 @@
             }, 2500);
         }
 
-        // Updated Gemini API Handler using gemini-3.8-flash model
-        async function callGeminiAPI(systemInstruction, userPromptText) {
+        // Gemini API Handler with Automatic Auto-Retry on High Demand
+        async function callGeminiAPI(systemInstruction, userPromptText, retries = 3, delay = 2000) {
             const apiKey = getApiKey();
             if (!apiKey) {
                 toggleSettingsModal();
                 throw new Error("Silakan masukkan Google Gemini API Key Anda terlebih dahulu!");
             }
 
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
             const requestBody = {
                 contents: [
@@ -436,24 +436,39 @@
                 }
             };
 
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestBody)
-            });
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(requestBody)
+                    });
 
-            if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                throw new Error(errData.error?.message || `Gagal menghubungi server AI (${response.status})`);
+                    if (response.status === 429 || response.status === 503) {
+                        // Jika server sibuk/limit sementara, tunggu lalu coba lagi otomatis
+                        if (i < retries - 1) {
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            continue;
+                        }
+                    }
+
+                    if (!response.ok) {
+                        const errData = await response.json().catch(() => ({}));
+                        throw new Error(errData.error?.message || `Gagal menghubungi server AI (${response.status})`);
+                    }
+
+                    const data = await response.json();
+                    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!rawText) {
+                        throw new Error("Respon AI kosong atau tidak dapat diproses.");
+                    }
+
+                    return JSON.parse(rawText);
+                } catch (err) {
+                    if (i === retries - 1) throw err;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
             }
-
-            const data = await response.json();
-            const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (!rawText) {
-                throw new Error("Respon AI kosong atau tidak dapat diproses.");
-            }
-
-            return JSON.parse(rawText);
         }
 
         async function generateContent() {
@@ -503,7 +518,7 @@ Format JSON Wajib: {"judul": "...", "kataUtama": "...", "makna": "...", "tagar":
                 saveToHistory(currentGeneratedData);
                 resultCard.classList.remove('hidden');
             } catch (err) {
-                errorMessage.innerText = err.message || "Terjadi kesalahan saat memproses konten.";
+                errorMessage.innerText = "Server AI sedang sibuk sesaat. Silakan coba tekan tombol 'Buat Konten' sekali lagi.";
                 errorBox.classList.remove('hidden');
             } finally {
                 loading.classList.add('hidden');
@@ -596,7 +611,7 @@ Format JSON Wajib: {"promptPoster": "..."}`;
                 posterText.innerText = res.promptPoster;
                 posterContent.classList.remove('hidden');
             } catch (err) {
-                posterText.innerText = "Gagal membuat prompt poster: " + (err.message || 'Terjadi kesalahan');
+                posterText.innerText = "Gagal membuat prompt poster: Server sedang sibuk sesaat.";
                 posterContent.classList.remove('hidden');
             } finally {
                 posterLoading.classList.add('hidden');
