@@ -1,2 +1,314 @@
-# konten-kreator-ai
-App KontenKreator AI
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KontenKreator AI Pro - Studio Konten Digital</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f0f3ff 0%, #f8fafc 100%);
+            color: #1e293b;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .container {
+            width: 100%;
+            max-width: 680px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+            margin-top: 15px;
+        }
+        .header-badge {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #4338ca;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        h1 {
+            color: #0f172a;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+        p.subtitle {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #334155;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 14px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            background-color: #f8fafc;
+            color: #0f172a;
+            transition: all 0.2s ease;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #4f46e5;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            line-height: 1.5;
+        }
+        .btn-generate {
+            width: 100%;
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+            transition: all 0.2s ease;
+        }
+        .btn-generate:hover {
+            background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+            transform: translateY(-1px);
+        }
+        .output-box {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            position: relative;
+        }
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .output-title {
+            font-weight: 700;
+            font-size: 14px;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .output-content {
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.7;
+            color: #334155;
+        }
+        .btn-copy {
+            background: #0ea5e9;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-copy:hover {
+            background: #0284c7;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: 600;
+            color: #4f46e5;
+            font-size: 14px;
+        }
+        .footer-credit {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-badge">✨ AI-Powered Creator Suite</div>
+    <h1>KontenKreator AI Studio</h1>
+    <p class="subtitle">Buat draf caption, skrip komedi, dongeng, hingga materi promosi instan bertenaga kecerdasan buatan.</p>
+
+    <div class="form-group">
+        <label for="modeSelect">Pilih Mode Pembuatan</label>
+        <select id="modeSelect" onchange="toggleMode()">
+            <option value="custom">✨ Perintah Bebas AI (Dongeng, Drama, Puisi, Artikel)</option>
+            <option value="template">📝 Generator Caption / Kata-Kata Cerdas</option>
+        </select>
+    </div>
+
+    <!-- Mode 1: Perintah Bebas AI -->
+    <div id="customSection" class="form-group">
+        <label for="promptInput">Ketik Perintah / Instruksi Bebas</label>
+        <textarea id="promptInput" placeholder="Contoh: Buatkan dongeng Si Kabayan ngala nangka dalam Bahasa Sunda yang lucu dan ada pesan moralnya..."></textarea>
+    </div>
+
+    <!-- Mode 2: Generator Caption Cerdas -->
+    <div id="templateSection" class="form-group" style="display: none;">
+        <label for="topikInput">Kata Kunci / Topik Utama</label>
+        <input type="text" id="topikInput" placeholder="Contoh: Lembur kerja malam sambil ngopi / Kopi Hitam">
+    </div>
+
+    <button class="btn-generate" onclick="prosesGenerate()">✨ Buat Konten Sekarang</button>
+
+    <div class="loading" id="loadingState">⏳ Sedang meracik konten terbaik untuk Anda, mohon tunggu sebentar...</div>
+
+    <!-- Hasil Output -->
+    <div class="output-box" id="resultContainer" style="display: none;">
+        <div class="output-header">
+            <span class="output-title">📌 Hasil Generasi Konten</span>
+            <button class="btn-copy" onclick="salinTeks()">📋 Salin Teks</button>
+        </div>
+        <div class="output-content" id="outputTeks"></div>
+    </div>
+
+    <div class="footer-credit">Rancage33 Digital Creator Suite</div>
+</div>
+
+<script>
+    // API KEY AKANG
+    const GEMINI_API_KEY = "AQ.Ab8RN6KfARy1wDh62nbDKaVzucwiQLeD-K3GDcviNGf_3ycRHQ";
+
+    function toggleMode() {
+        const mode = document.getElementById("modeSelect").value;
+        if (mode === "custom") {
+            document.getElementById("customSection").style.display = "block";
+            document.getElementById("templateSection").style.display = "none";
+        } else {
+            document.getElementById("customSection").style.display = "none";
+            document.getElementById("templateSection").style.display = "block";
+        }
+    }
+
+    async function prosesGenerate() {
+        const mode = document.getElementById("modeSelect").value;
+        const loadingState = document.getElementById("loadingState");
+        const resultContainer = document.getElementById("resultContainer");
+        const outputTeks = document.getElementById("outputTeks");
+
+        if (mode === "custom") {
+            const prompt = document.getElementById("promptInput").value.trim();
+            if (!prompt) {
+                alert("Silakan ketik perintah atau instruksi terlebih dahulu!");
+                return;
+            }
+
+            loadingState.style.display = "block";
+            resultContainer.style.display = "none";
+
+            const endpoints = [
+                `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+                `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`
+            ];
+
+            let berhasil = false;
+
+            for (let url of endpoints) {
+                try {
+                    const response = await fetch(url, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{ text: prompt }]
+                            }]
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
+                        outputTeks.innerText = data.candidates[0].content.parts[0].text;
+                        resultContainer.style.display = "block";
+                        berhasil = true;
+                        break;
+                    }
+                } catch (err) {
+                    console.log("Coba endpoint lain...");
+                }
+            }
+
+            if (!berhasil) {
+                alert("Gagal memproses AI. Pastikan file diunggah ke hosting web (GitHub Pages/Vercel), bukan dibuka langsung dari file lokal HP.");
+            }
+
+            loadingState.style.display = "none";
+
+        } else {
+            const topik = document.getElementById("topikInput").value.trim();
+            if (!topik) {
+                alert("Masukkan kata kunci terlebih dahulu!");
+                return;
+            }
+            outputTeks.innerText = generateSmartCaption(topik);
+            resultContainer.style.display = "block";
+        }
+    }
+
+    function generateSmartCaption(topik) {
+        const t = topik.toLowerCase();
+        if (t.includes("lembur") || t.includes("kerja") || t.includes("malam")) {
+            return `☕ **PEJUANG MALAM & LEMBUR**\n\n"Malam makin larut, tapi semangat ga boleh kendor! Ditemani aroma hangat kopi, setiap detiknya jadi saksi perjuangan menuntaskan ${topik}.\n\nBuat temen-temen yang lagi berjuang malam ini: Tetap semangat, jangan lupa rehat sejenak dan nikmati kopimu!"\n\n👉 Simpan & Bagikan ke teman seperjuanganmu!\n#Rancage33 #PejuangMalam #SemangatLembur #InspirasiHariIni`;
+        } else {
+            return `💡 **INSPIRASI HARI INI**\n\n"Setiap langkah kecil yang kita ambil untuk ${topik} akan membawa perubahan besar di masa depan. Tetap konsisten, nikmati prosesnya, dan salurkan ide-ide kreatifmu tanpa batas!\n\nSemangat berkarya dan beraktivitas hari ini!"\n\n👉 Simpan & Bagikan inspirasi ini ke teman-temanmu!\n#Rancage33 #InspirasiHariIni #MotivasiDiri`;
+        }
+    }
+
+    function salinTeks() {
+        const teks = document.getElementById("outputTeks").innerText;
+        navigator.clipboard.writeText(teks).then(() => {
+            alert("Teks berhasil disalin ke clipboard!");
+        }).catch(err => {
+            alert("Gagal menyalin teks.");
+        });
+    }
+</script>
+
+</body>
+</html>
+
