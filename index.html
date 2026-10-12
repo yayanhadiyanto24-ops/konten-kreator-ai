@@ -6,7 +6,7 @@
     <title>KONTEN KREATOR AI - Ide Jadi Konten, Siap Tayang!</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts Inter & Plus Jakarta Sans -->
+    <!-- Google Fonts Plus Jakarta Sans -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -78,7 +78,7 @@
             <i class="fa-solid fa-circle-exclamation text-amber-500 text-base mt-0.5"></i>
             <div class="flex-1">
                 <p class="font-bold">Kunci API Gemini Belum Dikonfigurasi!</p>
-                <p class="mt-0.5">Klik tombol roda gigi di pojok kanan atas untuk memasukkan Kunci API Gemini Anda agar AI dapat bekerja dengan lancar.</p>
+                <p class="mt-0.5">Klik tombol roda gigi di pojok kanan atas untuk memasukkan Kunci API Gemini Anda.</p>
             </div>
         </div>
 
@@ -98,7 +98,6 @@
                 class="w-full p-3.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:outline-none transition-all placeholder:text-slate-400 leading-relaxed"
                 placeholder="Masukkan kata kunci, ide, tema, cerita, atau perintah Anda di sini..."></textarea>
 
-            <!-- Chips Contoh Prompt -->
             <div>
                 <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Contoh Ide Cepat:</p>
                 <div class="flex flex-wrap gap-1.5">
@@ -326,7 +325,6 @@
 
             <div class="space-y-2 text-xs text-slate-600">
                 <p>Masukkan Google Gemini API Key Anda dari Google AI Studio di bawah ini:</p>
-                
                 <input type="password" id="apiKeyInput" placeholder="Tempel kunci API Anda di sini..." 
                     class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
             </div>
@@ -413,7 +411,7 @@
             }, 2500);
         }
 
-        // Updated Gemini API Handler supporting ALL official API Key formats (including AQ.)
+        // Updated Gemini API Handler using gemini-3.8-flash model
         async function callGeminiAPI(systemInstruction, userPromptText) {
             const apiKey = getApiKey();
             if (!apiKey) {
@@ -421,7 +419,7 @@
                 throw new Error("Silakan masukkan Google Gemini API Key Anda terlebih dahulu!");
             }
 
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
 
             const requestBody = {
                 contents: [
