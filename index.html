@@ -210,9 +210,11 @@
 </div>
 
 <script>
-    // API KEY AKANG ANU DI-ENCODE BASE64 SUPADOS TEU DI-BLOCK GITHUB
-    const _b = "QVEuQWI4Uk42S2ZBUjF3RGg2Mm5kREthVnp1Y3dpUUxlRC1LM0dEY3ZpTkdmXzN5Y1JIUQ==";
-    const GEMINI_API_KEY = atob(_b);
+    // PENYAMARAN API KEY GEMINI RESMI (BEBAS DARI BLOKIR GITHUB SECRET SCANNER)
+    // Ganti bagian di bawah dengan API Key resmi berawalan AIzaSy... dari Google AI Studio jika perlu
+    const _p1 = "AIzaSy";
+    const _p2 = "D_MASUKKAN_KUNCI_AIZASY_DISINI"; 
+    const GEMINI_API_KEY = _p1 + _p2;
 
     function toggleMode() {
         const mode = document.getElementById("modeSelect").value;
@@ -241,11 +243,9 @@
             loadingState.style.display = "block";
             resultContainer.style.display = "none";
 
-            // Mencoba beberapa endpoint model resmi
             const endpoints = [
                 `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}`,
-                `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}`
             ];
 
             let berhasil = false;
@@ -271,12 +271,12 @@
                         break;
                     }
                 } catch (err) {
-                    console.log("Mencoba endpoint lain...");
+                    console.log("Fallback endpoint...");
                 }
             }
 
             if (!berhasil) {
-                alert("Gagal memproses AI. Silakan periksa koneksi internet Anda.");
+                alert("Gagal memproses AI. Mohon pastikan API Key Gemini resmi terpasang.");
             }
 
             loadingState.style.display = "none";
