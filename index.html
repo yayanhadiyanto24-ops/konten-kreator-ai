@@ -245,7 +245,7 @@
             <div class="flex items-center gap-2 font-bold text-rose-700 text-sm">
                 <i class="fa-solid fa-triangle-exclamation"></i> Terjadi Kendala Pembuatan
             </div>
-            <p id="errorMessage" class="text-xs leading-relaxed"></p>
+            <p id="errorMessage" class="text-xs leading-relaxed font-medium break-words"></p>
         </div>
 
         <!-- OUTPUT RESULT DISPLAY CARD -->
@@ -416,7 +416,8 @@
             }, 2500);
         }
 
-        async function callGeminiAPI(systemInstruction, userPromptText, retries = 3, delay = 2000) {
+        // FUNGSI PEMANGGILAN API GEMINI YANG SUDAH DIPERBAIKI
+        async function callGeminiAPI(systemInstructionText, userPromptText, retries = 2, delay = 2000) {
             const apiKey = getApiKey();
             if (!apiKey) {
                 toggleSettingsModal();
@@ -426,12 +427,13 @@
             const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
             const requestBody = {
+                system_instruction: {
+                    parts: [{ text: systemInstructionText }]
+                },
                 contents: [
                     {
                         role: "user",
-                        parts: [
-                            { text: `${systemInstruction}\n\nInstruksi/Ide Pengguna:\n${userPromptText}` }
-                        ]
+                        parts: [{ text: userPromptText }]
                     }
                 ],
                 generationConfig: {
@@ -457,13 +459,13 @@
 
                     if (!response.ok) {
                         const errData = await response.json().catch(() => ({}));
-                        throw new Error(errData.error?.message || `Gagal menghubungi server AI (${response.status})`);
+                        throw new Error(errData.error?.message || `Gagal terhubung ke Gemini API (Status ${response.status})`);
                     }
 
                     const data = await response.json();
                     const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
                     if (!rawText) {
-                        throw new Error("Respon AI kosong atau tidak dapat diproses.");
+                        throw new Error("Respon AI kosong atau format tidak sesuai.");
                     }
 
                     return JSON.parse(rawText);
@@ -521,7 +523,8 @@ Format JSON Wajib: {"judul": "...", "kataUtama": "...", "makna": "...", "tagar":
                 saveToHistory(currentGeneratedData);
                 resultCard.classList.remove('hidden');
             } catch (err) {
-                errorMessage.innerText = "Server AI sedang sibuk sesaat. Silakan coba tekan tombol 'Buat Konten' sekali lagi.";
+                // MENAMPILKAN PESAN ERROR ASLI
+                errorMessage.innerText = err.message || "Gagal memproses permintaan.";
                 errorBox.classList.remove('hidden');
             } finally {
                 loading.classList.add('hidden');
@@ -538,47 +541,47 @@ Format JSON Wajib: {"judul": "...", "kataUtama": "...", "makna": "...", "tagar":
                 container.innerHTML = `
                     <div class="space-y-1">
                         <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">📌 Judul Konten</span>
-                        <h4 class="font-bold text-slate-800 text-base leading-snug">${data.judul}</h4>
+                        <h4 class="font-bold text-slate-800 text-base leading-snug">${data.judul || ''}</h4>
                     </div>
                     <div class="bg-amber-50/80 border border-amber-200/80 rounded-xl p-3 space-y-1">
                         <span class="text-[11px] font-bold text-amber-800 uppercase tracking-wider"><i class="fa-solid fa-bolt text-amber-500"></i> Hook Pembuka</span>
-                        <p class="text-xs font-semibold text-amber-950 leading-relaxed">${data.hook}</p>
+                        <p class="text-xs font-semibold text-amber-950 leading-relaxed">${data.hook || ''}</p>
                     </div>
                     <div class="space-y-1">
                         <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">📝 Isi Caption</span>
-                        <div class="text-xs text-slate-700 leading-relaxed whitespace-pre-line bg-slate-50 p-3 rounded-xl border border-slate-200">${data.caption}</div>
+                        <div class="text-xs text-slate-700 leading-relaxed whitespace-pre-line bg-slate-50 p-3 rounded-xl border border-slate-200">${data.caption || ''}</div>
                     </div>
                     <div class="space-y-1">
                         <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">🏷️ Tagar Relevan</span>
-                        <p class="text-xs font-semibold text-emerald-700 bg-emerald-50 p-2.5 rounded-xl border border-emerald-100">${data.tagar}</p>
+                        <p class="text-xs font-semibold text-emerald-700 bg-emerald-50 p-2.5 rounded-xl border border-emerald-100">${data.tagar || ''}</p>
                     </div>`;
             } else if (type === 'free') {
                 container.innerHTML = `
                     <div class="space-y-1">
                         <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">📌 Judul Utama</span>
-                        <h4 class="font-bold text-slate-800 text-base leading-snug">${data.judul}</h4>
+                        <h4 class="font-bold text-slate-800 text-base leading-snug">${data.judul || ''}</h4>
                     </div>
                     <div class="space-y-1">
                         <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">📜 Isi Karya</span>
-                        <div class="text-xs text-slate-800 leading-relaxed whitespace-pre-line bg-slate-50 p-3.5 rounded-xl border border-slate-200">${data.isi}</div>
+                        <div class="text-xs text-slate-800 leading-relaxed whitespace-pre-line bg-slate-50 p-3.5 rounded-xl border border-slate-200">${data.isi || ''}</div>
                     </div>
                     ${data.penutup ? `<div class="space-y-1"><span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">💡 Penutup</span><p class="text-xs text-slate-600 bg-slate-100 p-3 rounded-xl">${data.penutup}</p></div>` : ''}
                     <div class="space-y-1">
-                        <p class="text-xs font-semibold text-emerald-700 bg-emerald-50 p-2.5 rounded-xl border border-emerald-100">${data.tagar}</p>
+                        <p class="text-xs font-semibold text-emerald-700 bg-emerald-50 p-2.5 rounded-xl border border-emerald-100">${data.tagar || ''}</p>
                     </div>`;
             } else if (type === 'smartQuote') {
                 container.innerHTML = `
                     <div class="space-y-1">
                         <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">💡 Tema Kutipan</span>
-                        <h4 class="font-bold text-slate-800 text-sm">${data.judul}</h4>
+                        <h4 class="font-bold text-slate-800 text-sm">${data.judul || ''}</h4>
                     </div>
                     <div class="bg-gradient-to-tr from-emerald-900 to-emerald-800 text-white rounded-2xl p-4 shadow-md space-y-2">
                         <i class="fa-solid fa-quote-left text-emerald-400 text-2xl opacity-40"></i>
-                        <p class="text-sm font-semibold leading-relaxed italic">${data.kataUtama}</p>
+                        <p class="text-sm font-semibold leading-relaxed italic">${data.kataUtama || ''}</p>
                     </div>
                     ${data.makna ? `<div class="space-y-1"><span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">🔍 Perenungan</span><p class="text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200">${data.makna}</p></div>` : ''}
                     <div class="space-y-1">
-                        <p class="text-xs font-semibold text-emerald-700 bg-emerald-50 p-2.5 rounded-xl border border-emerald-100">${data.tagar}</p>
+                        <p class="text-xs font-semibold text-emerald-700 bg-emerald-50 p-2.5 rounded-xl border border-emerald-100">${data.tagar || ''}</p>
                     </div>`;
             }
         }
@@ -614,7 +617,7 @@ Format JSON Wajib: {"promptPoster": "..."}`;
                 posterText.innerText = res.promptPoster;
                 posterContent.classList.remove('hidden');
             } catch (err) {
-                posterText.innerText = "Gagal membuat prompt poster: Server sedang sibuk sesaat.";
+                posterText.innerText = `Gagal membuat prompt poster: ${err.message}`;
                 posterContent.classList.remove('hidden');
             } finally {
                 posterLoading.classList.add('hidden');
