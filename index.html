@@ -416,7 +416,7 @@
             }, 2500);
         }
 
-        // FUNGSI API GEMINI DENGAN MODEL TERBARU & BERHASIL DITERIMA SERUAN V1BETA
+        // FUNGSI API GEMINI DENGAN MODEL gemini-2.5-flash
         async function callGeminiAPI(systemInstructionText, userPromptText, retries = 2, delay = 2000) {
             const apiKey = getApiKey();
             if (!apiKey) {
@@ -424,8 +424,8 @@
                 throw new Error("Silakan masukkan Google Gemini API Key Anda terlebih dahulu!");
             }
 
-            // MENGGUNAKAN gemini-2.0-flash YANG TERSEDIA DI V1BETA
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            // PERBAIKAN: Menggunakan model gemini-2.5-flash
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
             const requestBody = {
                 system_instruction: {
