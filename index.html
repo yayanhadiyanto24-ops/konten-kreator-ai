@@ -83,7 +83,7 @@
             <i class="fa-solid fa-circle-exclamation text-amber-500 text-base mt-0.5"></i>
             <div class="flex-1">
                 <p class="font-bold">Kunci API Gemini Belum Dikonfigurasi!</p>
-                <p class="mt-0.5">Klik tombol roda gigi di pojok kanan atas untuk memasukkan Kunci API Gemini Anda.</p>
+                <p class="mt-0.5">Klik ikon roda gigi di pojok kanan atas untuk memasukkan Kunci API Gemini Anda agar aplikasi dapat digunakan.</p>
             </div>
         </div>
 
@@ -316,9 +316,9 @@
 
     </main>
 
-    <!-- Modal Settings / API Key -->
+    <!-- Modal Settings / API Key DENGAN TUTORIAL LENGKAP -->
     <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-2xl">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b pb-3">
                 <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
                     <i class="fa-solid fa-key text-emerald-600"></i> Pengaturan API Key
@@ -328,14 +328,32 @@
                 </button>
             </div>
 
+            <!-- Panduan Bantuan Pengguna Awam -->
+            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 space-y-2 text-xs text-emerald-900">
+                <p class="font-bold flex items-center gap-1.5 text-emerald-800">
+                    <i class="fa-solid fa-circle-info text-emerald-600"></i> Cara Gratis Dapatkan Gemini API Key:
+                </p>
+                <ol class="list-decimal list-inside space-y-1.5 text-slate-700 leading-relaxed font-medium">
+                    <li>Klik tombol hijau di bawah untuk menuju halaman resmi Google AI Studio.</li>
+                    <li>Login dengan **Akun Google** Anda, lalu tekan tombol **"Create API Key"**.</li>
+                    <li>Salin (*copy*) kunci yang muncul, lalu tempel (*paste*) pada kolom input di bawah ini.</li>
+                </ol>
+                
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" 
+                   class="mt-2 w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-2 transition-all shadow-sm">
+                    <span>🚀 Ambil API Key di Google AI Studio</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                </a>
+            </div>
+
             <div class="space-y-2 text-xs text-slate-600">
-                <p>Masukkan Google Gemini API Key Anda dari Google AI Studio di bawah ini:</p>
-                <input type="password" id="apiKeyInput" placeholder="Tempel kunci API Anda di sini..." 
+                <label for="apiKeyInput" class="font-bold text-slate-700 block">Tempelkan API Key Anda di Sini:</label>
+                <input type="password" id="apiKeyInput" placeholder="Contoh: AIzaSyD..." 
                     class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
             </div>
 
-            <div class="flex gap-2 pt-2">
-                <button onclick="saveApiKey()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-colors">
+            <div class="flex gap-2 pt-1">
+                <button onclick="saveApiKey()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-colors shadow-md shadow-emerald-200">
                     Simpan Kunci
                 </button>
             </div>
@@ -416,7 +434,6 @@
             }, 2500);
         }
 
-        // FUNGSI API GEMINI DENGAN MODEL gemini-3.8-flash SESUAI INSTRUKSI DARI GOOGLE API
         async function callGeminiAPI(systemInstructionText, userPromptText, retries = 2, delay = 2000) {
             const apiKey = getApiKey();
             if (!apiKey) {
@@ -424,7 +441,6 @@
                 throw new Error("Silakan masukkan Google Gemini API Key Anda terlebih dahulu!");
             }
 
-            // MENGGUNAKAN MODEL GEMINI TERBARU gemini-3.8-flash
             const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
 
             const requestBody = {
