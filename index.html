@@ -416,7 +416,7 @@
             }, 2500);
         }
 
-        // FUNGSI PEMANGGILAN API GEMINI YANG SUDAH DIPERBAIKI
+        // FUNGSI API GEMINI DENGAN MODEL TERBARU & BERHASIL DITERIMA SERUAN V1BETA
         async function callGeminiAPI(systemInstructionText, userPromptText, retries = 2, delay = 2000) {
             const apiKey = getApiKey();
             if (!apiKey) {
@@ -424,7 +424,8 @@
                 throw new Error("Silakan masukkan Google Gemini API Key Anda terlebih dahulu!");
             }
 
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            // MENGGUNAKAN gemini-2.0-flash YANG TERSEDIA DI V1BETA
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
             const requestBody = {
                 system_instruction: {
@@ -523,7 +524,6 @@ Format JSON Wajib: {"judul": "...", "kataUtama": "...", "makna": "...", "tagar":
                 saveToHistory(currentGeneratedData);
                 resultCard.classList.remove('hidden');
             } catch (err) {
-                // MENAMPILKAN PESAN ERROR ASLI
                 errorMessage.innerText = err.message || "Gagal memproses permintaan.";
                 errorBox.classList.remove('hidden');
             } finally {
